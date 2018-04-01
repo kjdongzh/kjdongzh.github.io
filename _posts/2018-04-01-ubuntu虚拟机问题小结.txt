@@ -1,0 +1,37 @@
+---
+title: ubuntu虚拟机问题小结
+description: 
+categories:
+ - ubuntu
+tags:
+---
+
+> 总结oracle virtual box 配置ubuntu虚拟机时遇到的问题和解决方法
+
+## 网卡配置
+
+Windows 7下用VirtualBox安装Ubuntu，要求ubuntu联网，此时Linux虚拟机需要两块网卡，一块使用NAT方式连接，用于连接互联网，默认设置即可，
+而第二块网卡的配置有些特别:
+* 如果Win7本地连接已经接入网络，则将桥接网卡桥接在本地连接的网卡上（图中的Realtek PCIe GBE Family Controller）
+![Desktop Preview](https://www.linuxidc.com/upload/2014_10/14101109101380.png)
+
+* 如果Win7的本地连接为断开状态，使用的是Wifi上网，或未连接互联网，这时桥接网卡无法使用（不能和无线网卡桥接在一起）。此时可使用仅主机适配器，如图所示。
+![Desktop Preview](https://www.linuxidc.com/upload/2014_10/14101109114404.png)
+
+## Node.js安装
+
+在ubuntu desktop 14.04环境下，按照Node.js官网说明进行安装，结果nodejs版本为v0.10.25，不是node官方最新版本，问题出在ubuntu本身自带的源中nodejs版本较老，所以要安装最新版本的nodejs需要按照如下方法：
+
+
+```
+# 删除软件及其配置文件
+apt-get --purge remove nodejs
+# 删除没用的依赖包
+apt-get autoremove nodejs
+
+# 复制下列命令安装，其中7.x可以换成其他版本
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 68576280
+sudo apt-add-repository "deb https://deb.nodesource.com/node_7.x $(lsb_release -sc) main"
+sudo apt-get update
+sudo apt-get install nodejs
+```
